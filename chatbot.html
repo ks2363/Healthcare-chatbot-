@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #chat-container {
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #header {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        #chat-messages {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        #user-input {
+            display: flex;
+            padding: 15px;
+            align-items: center;
+            border-top: 1px solid #ddd;
+        }
+
+        #user-input input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        #user-input button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+    </style>
+    <title>Healthcare Chatbot</title>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="header">Healthcare Chatbot</div>
+        <div id="chat-messages"></div>
+        <div id="user-input">
+            <input type="text" id="user-message" placeholder="Type your symptoms...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById("user-message").value;
+            // Send an AJAX request to Flask backend
+            fetch('/process_symptoms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'symptoms': userMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response from server:', data);
+                // Handle the response from the server if needed
+                displayMessage("Bot", data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            // Display user message in the chat window
+            displayMessage("User", userMessage);
+            // Clear input field
+            document.getElementById("user-message").value = "";
+        }
+
+        function displayMessage(sender, message) {
+            var chatMessages = document.getElementById("chat-messages");
+            var newMessage = document.createElement("div");
+            newMessage.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatMessages.appendChild(newMessage);
+            // Scroll to the bottom of the chat container
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>
+
+
